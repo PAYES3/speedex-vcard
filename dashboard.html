@@ -1,206 +1,238 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Speedex Dashboard - Supabase Integrated</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
-    body { font-family: 'Montserrat', sans-serif; }
-  </style>
-</head>
-<body class="bg-slate-100 min-h-screen p-4 sm:p-8">
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speedex Dashboard - Supabase Integrated</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+      body { font-family: 'Montserrat', sans-serif; }
+    </style>
+  </head>
+  <body class="bg-slate-100 min-h-screen p-4 sm:p-8">
 
-  <div class="max-w-4xl mx-auto">
-    <!-- Header Bar -->
-    <div class="bg-[#181A1E] text-white p-6 rounded-2xl shadow-lg mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div>
-        <h1 class="text-xl font-bold">Speedex Card Dashboard</h1>
-        <p class="text-xs text-slate-400 mt-1">Supabase DB Live Connection & Center Logo QR Generator</p>
-      </div>
-      <span class="bg-[#6B3020] px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider">Admin Panel</span>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <!-- Input Form -->
-      <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 border-b pb-2">Employee Details</h2>
-        
-        <form id="cardForm" class="space-y-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">Vercel Domain Base URL</label>
-            <input type="text" id="in-baseUrl" value="https://speedex-vcard.vercel.app/index.html" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Full Name *</label>
-              <input type="text" id="in-name" required value="Sameer Mohamed" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Designation *</label>
-              <input type="text" id="in-desig" required value="Managing Director" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
-            </div>
-          </div>
-
-          <!-- Profile Photo URL Field -->
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">Profile Photo Image URL (Optional)</label>
-            <input type="text" id="in-photoUrl" placeholder="https://example.com/my-photo.jpg" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
-            <span class="text-[10px] text-slate-400">இங்கு போட்டோ லிங்க் கொடுக்காவிட்டால், பெயரின் முதல் எழுத்துக்கள் (Initials) தானாகத் தெரியும்.</span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Phone Number *</label>
-              <input type="text" id="in-phone" required value="+971 55 717 8432" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Email Address *</label>
-              <input type="email" id="in-email" required value="sameer.md@excellentgroup.ae" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">Office Address</label>
-            <input type="text" id="in-loc" value="Musaffah - M38 - Abu Dhabi" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">Google Maps Link</label>
-            <input type="text" id="in-mapUrl" value="https://maps.google.com/?q=Musaffah+M38+Abu+Dhabi" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Website</label>
-              <input type="text" id="in-website" value="www.speedexgroups.ae" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Brochure File</label>
-              <input type="text" id="in-brochure" value="speedex-brochure.pdf" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1">Instagram Link</label>
-              <input type="text" id="in-insta" value="https://instagram.com" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
-            </div>
-          </div>
-
-          <button type="button" id="submit-btn" onclick="saveToSupabase()" class="w-full bg-[#6B3020] hover:bg-[#522418] text-white font-bold py-3 px-4 rounded-xl shadow transition text-xs flex items-center justify-center gap-2 mt-4">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Save to Supabase & Generate QR</span>
-          </button>
-        </form>
+    <div class="max-w-4xl mx-auto">
+      <!-- Header Bar -->
+      <div class="bg-[#181A1E] text-white p-6 rounded-2xl shadow-lg mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h1 class="text-xl font-bold">Speedex Card Dashboard</h1>
+          <p class="text-xs text-slate-400 mt-1">Supabase DB & Photo Upload Integrated</p>
+        </div>
+        <span class="bg-[#6B3020] px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider">Admin Panel</span>
       </div>
 
-      <!-- Output Panel -->
-      <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-between">
-        <div class="w-full text-center">
-          <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 border-b pb-2">Generated QR (with Logo)</h2>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Input Form -->
+        <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+          <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 border-b pb-2">Employee Details</h2>
           
-          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 inline-block shadow-inner mb-4">
-            <div class="relative inline-block">
-              <div id="dashboard-qr" class="flex items-center justify-center min-w-[260px] min-h-[260px]">
-                <span class="text-xs text-slate-400">Fill form and click Save</span>
+          <form id="cardForm" class="space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Vercel Domain Base URL</label>
+              <input type="text" id="in-baseUrl" value="https://speedex-vcard.vercel.app/index.html" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Full Name *</label>
+                <input type="text" id="in-name" required value="Sameer Mohamed" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
               </div>
-              <img id="qr-center-logo" src="logo.png" alt="Logo" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-white p-1 rounded-xl border border-slate-200 shadow-md object-contain pointer-events-none">
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Designation *</label>
+                <input type="text" id="in-desig" required value="Managing Director" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
+              </div>
+            </div>
+
+            <!-- Profile Photo Section: Upload PC or URL -->
+            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-3">
+              <label class="block text-xs font-bold text-slate-700">Profile Photo (PC Upload OR Link)</label>
+              
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 mb-1">Option 1: Upload Image from PC</label>
+                <input type="file" id="in-photoFile" accept="image/*" class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#6B3020] file:text-white hover:file:bg-[#522418]">
+              </div>
+
+              <div class="text-center text-[10px] text-slate-400 font-bold uppercase">--- OR ---</div>
+
+              <div>
+                <label class="block text-[10px] font-bold text-slate-500 mb-1">Option 2: Direct Photo URL Link</label>
+                <input type="text" id="in-photoUrl" placeholder="https://example.com/my-photo.jpg" class="w-full border border-slate-300 p-2 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none bg-white">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Phone Number *</label>
+                <input type="text" id="in-phone" required value="+971 55 717 8432" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Email Address *</label>
+                <input type="email" id="in-email" required value="sameer.md@excellentgroup.ae" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Office Address</label>
+              <input type="text" id="in-loc" value="Musaffah - M38 - Abu Dhabi" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1">Google Maps Link</label>
+              <input type="text" id="in-mapUrl" value="https://maps.google.com/?q=Musaffah+M38+Abu+Dhabi" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Website</label>
+                <input type="text" id="in-website" value="www.speedexgroups.ae" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Brochure File</label>
+                <input type="text" id="in-brochure" value="speedex-brochure.pdf" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Instagram Link</label>
+                <input type="text" id="in-insta" value="https://instagram.com" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
+              </div>
+            </div>
+
+            <button type="button" id="submit-btn" onclick="saveToSupabase()" class="w-full bg-[#6B3020] hover:bg-[#522418] text-white font-bold py-3 px-4 rounded-xl shadow transition text-xs flex items-center justify-center gap-2 mt-4">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Save to Supabase & Generate QR</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Output Panel -->
+        <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-between">
+          <div class="w-full text-center">
+            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 border-b pb-2">Generated QR (with Logo)</h2>
+            
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 inline-block shadow-inner mb-4">
+              <div class="relative inline-block">
+                <div id="dashboard-qr" class="flex items-center justify-center min-w-[260px] min-h-[260px]">
+                  <span class="text-xs text-slate-400">Fill form and click Save</span>
+                </div>
+                <img id="qr-center-logo" src="logo.png" alt="Logo" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-white p-1 rounded-xl border border-slate-200 shadow-md object-contain pointer-events-none">
+              </div>
+            </div>
+
+            <div class="text-left w-full space-y-2 mt-2">
+              <label class="block text-[10px] font-bold text-slate-400 uppercase">Live Supabase Card Link</label>
+              <input type="text" id="out-url" readonly placeholder="Link will appear here..." class="w-full bg-slate-100 border border-slate-200 p-2.5 rounded-xl text-[11px] font-mono text-slate-700 outline-none select-all">
             </div>
           </div>
 
-          <div class="text-left w-full space-y-2 mt-2">
-            <label class="block text-[10px] font-bold text-slate-400 uppercase">Live Supabase Card Link</label>
-            <input type="text" id="out-url" readonly placeholder="Link will appear here..." class="w-full bg-slate-100 border border-slate-200 p-2.5 rounded-xl text-[11px] font-mono text-slate-700 outline-none select-all">
+          <div class="w-full space-y-2 mt-6">
+            <button onclick="copyGeneratedUrl()" class="w-full bg-[#3D5D69] hover:bg-[#2e4751] text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition">
+              <i class="fa-solid fa-copy"></i>
+              <span>Copy Card Link</span>
+            </button>
+
+            <a id="test-card-btn" href="#" target="_blank" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition pointer-events-none opacity-50">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              <span>Open Saved Card Page</span>
+            </a>
           </div>
-        </div>
-
-        <div class="w-full space-y-2 mt-6">
-          <button onclick="copyGeneratedUrl()" class="w-full bg-[#3D5D69] hover:bg-[#2e4751] text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition">
-            <i class="fa-solid fa-copy"></i>
-            <span>Copy Card Link</span>
-          </button>
-
-          <a id="test-card-btn" href="#" target="_blank" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition pointer-events-none opacity-50">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            <span>Open Saved Card Page</span>
-          </a>
         </div>
       </div>
     </div>
-  </div>
 
-  <script>
-    const SUPABASE_URL = "https://coejwpuctpkymcvzqzwh.supabase.co";
-    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY"; // Replace with sb_publishable_...
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <script>
+      const SUPABASE_URL = "https://coejwpuctpkymcvzqzwh.supabase.co";
+      const SUPABASE_ANON_KEY = "sb_publishable_zxzYhq0Af8HAe4T4k8cpCw_uuC8F79d"; // Replace with sb_publishable_...
+      const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    async function saveToSupabase() {
-      const btn = document.getElementById('submit-btn');
-      btn.disabled = true;
-      btn.innerText = "Saving to Database...";
+      async function saveToSupabase() {
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = true;
+        btn.innerText = "Processing Image & Saving...";
 
-      const payload = {
-        name: document.getElementById('in-name').value.trim(),
-        desig: document.getElementById('in-desig').value.trim(),
-        photo_url: document.getElementById('in-photoUrl').value.trim(),
-        phone: document.getElementById('in-phone').value.trim(),
-        email: document.getElementById('in-email').value.trim(),
-        loc: document.getElementById('in-loc').value.trim(),
-        map_url: document.getElementById('in-mapUrl').value.trim(),
-        website: document.getElementById('in-website').value.trim(),
-        brochure: document.getElementById('in-brochure').value.trim(),
-        insta: document.getElementById('in-insta').value.trim()
-      };
+        try {
+          let finalPhotoUrl = document.getElementById('in-photoUrl').value.trim();
+          const fileInput = document.getElementById('in-photoFile');
 
-      try {
-        const { data, error } = await _supabase.from('employees').insert([payload]).select().single();
-        
-        if (error) throw error;
+          // Check if user selected a file from PC
+          if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const filePath = `profiles/${fileName}`;
 
-        let baseUrl = document.getElementById('in-baseUrl').value.trim();
-        if(!baseUrl) baseUrl = 'index.html';
+            // Upload File to Supabase Storage 'avatars' Bucket
+            const { error: uploadError } = await _supabase.storage.from('avatars').upload(filePath, file);
 
-        const cardUrl = `${baseUrl}?id=${data.id}`;
-        document.getElementById('out-url').value = cardUrl;
+            if (uploadError) {
+              throw new Error("Photo Upload Failed: " + uploadError.message);
+            }
 
-        const testBtn = document.getElementById('test-card-btn');
-        testBtn.href = cardUrl;
-        testBtn.classList.remove('pointer-events-none', 'opacity-50');
+            // Get Public URL of uploaded image
+            const { data: publicUrlData } = _supabase.storage.from('avatars').getPublicUrl(filePath);
+            finalPhotoUrl = publicUrlData.publicUrl;
+          }
 
-        const qrBox = document.getElementById('dashboard-qr');
-        qrBox.innerHTML = "";
+          const payload = {
+            name: document.getElementById('in-name').value.trim(),
+            desig: document.getElementById('in-desig').value.trim(),
+            photo_url: finalPhotoUrl,
+            phone: document.getElementById('in-phone').value.trim(),
+            email: document.getElementById('in-email').value.trim(),
+            loc: document.getElementById('in-loc').value.trim(),
+            map_url: document.getElementById('in-mapUrl').value.trim(),
+            website: document.getElementById('in-website').value.trim(),
+            brochure: document.getElementById('in-brochure').value.trim(),
+            insta: document.getElementById('in-insta').value.trim()
+          };
 
-        new QRCode(qrBox, {
-          text: cardUrl,
-          width: 260,
-          height: 260,
-          colorDark: "#181A1E",
-          colorLight: "#FFFFFF",
-          correctLevel: QRCode.CorrectLevel.H
-        });
+          const { data, error } = await _supabase.from('employees').insert([payload]).select().single();
+          
+          if (error) throw error;
 
-        document.getElementById('qr-center-logo').classList.remove('hidden');
+          let baseUrl = document.getElementById('in-baseUrl').value.trim();
+          if(!baseUrl) baseUrl = 'index.html';
 
-      } catch (err) {
-        alert("Error saving data: " + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i><span>Save to Supabase & Generate QR</span>`;
+          const cardUrl = `${baseUrl}?id=${data.id}`;
+          document.getElementById('out-url').value = cardUrl;
+
+          const testBtn = document.getElementById('test-card-btn');
+          testBtn.href = cardUrl;
+          testBtn.classList.remove('pointer-events-none', 'opacity-50');
+
+          const qrBox = document.getElementById('dashboard-qr');
+          qrBox.innerHTML = "";
+
+          new QRCode(qrBox, {
+            text: cardUrl,
+            width: 260,
+            height: 260,
+            colorDark: "#181A1E",
+            colorLight: "#FFFFFF",
+            correctLevel: QRCode.CorrectLevel.H
+          });
+
+          document.getElementById('qr-center-logo').classList.remove('hidden');
+
+        } catch (err) {
+          alert("Error: " + err.message);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i><span>Save to Supabase & Generate QR</span>`;
+        }
       }
-    }
 
-    function copyGeneratedUrl() {
-      const urlInput = document.getElementById('out-url');
-      if(!urlInput.value) return;
-      urlInput.select();
-      navigator.clipboard.writeText(urlInput.value);
-      alert("Live Supabase Card Link Copied!");
-    }
-  </script>
-</body>
-</html>
+      function copyGeneratedUrl() {
+        const urlInput = document.getElementById('out-url');
+        if(!urlInput.value) return;
+        urlInput.select();
+        navigator.clipboard.writeText(urlInput.value);
+        alert("Live Supabase Card Link Copied!");
+      }
+    </script>
+  </body>
+  </html>
