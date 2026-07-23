@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speedex Digital Business Card</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 min-h-screen flex items-center justify-center p-4 font-sans">
+
+  <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
+    <!-- Header banner -->
+    <div class="bg-gradient-to-r from-teal-800 to-red-800 p-6 text-white text-center relative">
+      <img src="logo.png" alt="Speedex Logo" class="h-10 mx-auto mb-3 bg-white p-1 rounded">
+      <h2 id="emp-name" class="text-xl font-bold tracking-wide">Loading...</h2>
+      <p id="emp-designation" class="text-xs text-slate-200 mt-1 uppercase tracking-wider font-semibold"></p>
+      <p class="text-xs text-slate-300 mt-0.5 font-medium">Speedex Auto Workshop LLC</p>
+    </div>
+
+    <!-- Details -->
+    <div class="p-6 space-y-4">
+      <div class="border-b pb-2">
+        <p class="text-xs text-slate-400 font-bold uppercase">Phone</p>
+        <p id="emp-phone" class="text-sm font-semibold text-slate-800">-</p>
+      </div>
+      <div class="border-b pb-2">
+        <p class="text-xs text-slate-400 font-bold uppercase">Email</p>
+        <p id="emp-email" class="text-sm font-semibold text-slate-800 break-all">-</p>
+      </div>
+      <div class="border-b pb-2">
+        <p class="text-xs text-slate-400 font-bold uppercase">Location</p>
+        <p id="emp-location" class="text-sm font-semibold text-slate-800">-</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="pt-2 space-y-3">
+        <!-- Save Contact Button -->
+        <a id="vcf-link" href="#" class="block w-full text-center bg-red-700 hover:bg-red-800 text-white font-bold py-3 rounded-xl shadow transition text-sm">
+          📇 Save to Contacts
+        </a>
+
+        <!-- Download Brochure Button -->
+        <a href="speedex-brochure.pdf" download="Speedex_Brochure.pdf" class="block w-full text-center bg-teal-800 hover:bg-teal-900 text-white font-bold py-3 rounded-xl shadow transition text-sm flex items-center justify-center gap-2">
+          📄 Download Company Brochure
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get('name') || "Sarala";
+    const desig = urlParams.get('desig') || "Digital Marketing Executive";
+    const comp = "Speedex Auto Workshop LLC";
+    const phone = urlParams.get('phone') || "+971 50 000 0000";
+    const email = urlParams.get('email') || "sarala@speedexauto.com";
+    const loc = urlParams.get('loc') || "Abu Dhabi, UAE";
+
+    document.getElementById('emp-name').innerText = name;
+    document.getElementById('emp-designation').innerText = desig;
+    document.getElementById('emp-phone').innerText = phone;
+    document.getElementById('emp-email').innerText = email;
+    document.getElementById('emp-location').innerText = loc;
+
+    // VCF Contact File Generation
+    const vcfData = `BEGIN:VCARD\nVERSION:3.0\nN:;${name};;;\nFN:${name}\nORG:${comp}\nTITLE:${desig}\nTEL;TYPE=CELL:${phone}\nEMAIL:${email}\nURL:www.speedexgroups.ae\nEND:VCARD`;
+    const blob = new Blob([vcfData], { type: 'text/vcard' });
+    document.getElementById('vcf-link').href = URL.createObjectURL(blob);
+    document.getElementById('vcf-link').download = `${name.replace(/\s+/g, '_')}.vcf`;
+  </script>
+</body>
+</html>

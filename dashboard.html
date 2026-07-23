@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speedex - Cloud vCard & QR Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- QR Code Styling Library -->
+  <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <style>
+    .qr-preview canvas {
+      width: 130px !important;
+      height: 130px !important;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen p-6 font-sans">
+
+  <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-lg p-6">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-4 mb-6 gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800">Speedex vCard Cloud Manager</h1>
+        <p class="text-sm text-slate-500">Permanent Database Storage & High-Res QR Code Generator</p>
+      </div>
+
+      <!-- Domain Configuration Field -->
+      <div class="w-full md:w-auto bg-slate-50 p-3 rounded-lg border flex flex-col gap-1">
+        <label class="text-xs font-bold text-slate-600 uppercase">Your Live Hosted Website URL</label>
+        <input type="text" id="liveDomainInput" value="https://speedex-vcard.vercel.app/" 
+               class="border p-1.5 rounded text-xs w-full md:w-80 focus:outline-none focus:border-teal-700"
+               placeholder="e.g. https://your-site.vercel.app/">
+      </div>
+    </div>
+
+    <!-- Add Employee Form -->
+    <form id="employeeForm" class="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Full Name</label>
+        <input type="text" id="name" required placeholder="e.g. Sarala" class="w-full border p-2 rounded text-sm focus:outline-none focus:border-red-500">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Designation</label>
+        <input type="text" id="desig" required placeholder="e.g. Digital Marketing Executive" class="w-full border p-2 rounded text-sm focus:outline-none focus:border-red-500">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Phone</label>
+        <input type="text" id="phone" required placeholder="e.g. +971 55 175 1250" class="w-full border p-2 rounded text-sm focus:outline-none focus:border-red-500">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Email</label>
+        <input type="email" id="email" required placeholder="sarala@speedexgroups.ae" class="w-full border p-2 rounded text-sm focus:outline-none focus:border-red-500">
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Location</label>
+        <input type="text" id="loc" value="Abu Dhabi, UAE" class="w-full border p-2 rounded text-sm focus:outline-none focus:border-red-500">
+      </div>
+      <div class="flex items-end">
+        <button type="submit" id="submitBtn" class="w-full bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded transition text-sm">
+          + Add to Cloud Database
+        </button>
+      </div>
+    </form>
+
+    <!-- Employee Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-slate-800 text-white text-xs uppercase tracking-wider">
+            <th class="p-3">#</th>
+            <th class="p-3">Employee Details</th>
+            <th class="p-3 text-center">HD QR Code (Speedex Logo)</th>
+            <th class="p-3 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="employeeTableBody" class="divide-y divide-slate-200 text-sm">
+          <tr><td colspan="4" class="text-center py-6 text-slate-400">Loading Cloud Data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // 🔑 Replace with your actual Supabase URL & Anon Key
+    const SUPABASE_URL = 'https://YOUR_SUPABASE_PROJECT_ID.supabase.co';
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    
+    // Initialize Supabase Client
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const LOGO_URL = "logo.png"; // Unga logo file path
+    const qrInstances = {};
+
+    const liveDomainInput = document.getElementById('liveDomainInput');
+
+    // Save Live Domain Setting to LocalStorage
+    liveDomainInput.value = localStorage.getItem('speedex_live_domain') || "https://speedex-vcard.vercel.app/";
+    liveDomainInput.addEventListener('input', () => {
+      localStorage.setItem('speedex_live_domain', liveDomainInput.value);
+      fetchEmployees(); // Re-render QR codes with new URL
+    });
+
+    // 1. Fetch Employees from Supabase Cloud Database
+    async function fetchEmployees() {
+      const tableBody = document.getElementById('employeeTableBody');
+      
+      const { data: employees, error } = await supabaseClient
+        .from('employees')
+        .select('*')
+        .order('id', { ascending: true });
+
+      if (error) {
+        console.error("Supabase Error:", error);
+        tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-red-500">Error loading data. Please check Supabase Config!</td></tr>`;
+        return;
+      }
+
+      if (!employees || employees.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-6 text-slate-400">No records in database. Add an employee above!</td></tr>`;
+        return;
+      }
+
+      tableBody.innerHTML = '';
+
+      employees.forEach((emp, index) => {
+        const row = document.createElement('tr');
+        row.className = "hover:bg-slate-50 border-b";
+
+        const params = new URLSearchParams({
+          name: emp.name,
+          desig: emp.desig,
+          comp: "Speedex Auto Workshop LLC",
+          phone: emp.phone,
+          email: emp.email,
+          loc: emp.loc
+        }).toString();
+
+        let baseUrl = liveDomainInput.value.trim();
+        if(!baseUrl.endsWith('/')) baseUrl += '/';
+
+        const qrDataUrl = `${baseUrl}?${params}`;
+        const containerId = `qr-container-${emp.id}`;
+
+        row.innerHTML = `
+          <td class="p-3 font-bold text-slate-500">${index + 1}</td>
+          <td class="p-3">
+            <div class="font-bold text-slate-800 text-base">${emp.name}</div>
+            <div class="text-red-700 font-semibold text-xs">${emp.desig}</div>
+            <div class="text-slate-500 text-xs mt-1">📞 ${emp.phone}</div>
+            <div class="text-slate-500 text-xs">✉️ ${emp.email}</div>
+          </td>
+          <td class="p-3 text-center">
+            <div id="${containerId}" class="qr-preview inline-block p-1 bg-white border rounded shadow-sm"></div>
+          </td>
+          <td class="p-3 text-center">
+            <div class="flex flex-col gap-2 items-center">
+              <button onclick="downloadQR('${emp.id}', '${emp.name}')" class="bg-teal-800 hover:bg-teal-900 text-white text-xs px-3 py-2 rounded font-medium shadow flex items-center gap-1">
+                📥 Download HD QR
+              </button>
+              <button onclick="deleteEmployee(${emp.id})" class="text-red-500 hover:text-red-700 text-xs font-semibold mt-1">
+                🗑️ Delete Record
+              </button>
+            </div>
+          </td>
+        `;
+
+        tableBody.appendChild(row);
+
+        // Generate High Resolution (1200x1200px) QR Code with Speedex Logo
+        setTimeout(() => {
+          const qrCode = new QRCodeStyling({
+            width: 1200,
+            height: 1200,
+            type: "canvas",
+            data: qrDataUrl,
+            image: LOGO_URL,
+            dotsOptions: { color: "#000000", type: "square" },
+            backgroundOptions: { color: "#ffffff" },
+            imageOptions: { 
+              hideBackgroundDots: true, 
+              imageSize: 0.3,
+              margin: 4 
+            },
+            qrOptions: { errorCorrectionLevel: 'H' }
+          });
+
+          const container = document.getElementById(containerId);
+          if(container) {
+            container.innerHTML = '';
+            qrCode.append(container);
+            qrInstances[emp.id] = qrCode;
+          }
+        }, 50);
+      });
+    }
+
+    // 2. Add New Employee to Supabase Database
+    document.getElementById('employeeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.innerText = "Saving to Cloud...";
+      btn.disabled = true;
+
+      const newEmp = {
+        name: document.getElementById('name').value,
+        desig: document.getElementById('desig').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        loc: document.getElementById('loc').value
+      };
+
+      const { error } = await supabaseClient.from('employees').insert([newEmp]);
+
+      btn.innerText = "+ Add to Cloud Database";
+      btn.disabled = false;
+
+      if (error) {
+        alert("Error saving employee: " + error.message);
+      } else {
+        e.target.reset();
+        document.getElementById('loc').value = "Abu Dhabi, UAE";
+        fetchEmployees();
+      }
+    });
+
+    // 3. Delete Employee from Supabase
+    async function deleteEmployee(id) {
+      if (confirm("Permanently delete this employee from database?")) {
+        const { error } = await supabaseClient.from('employees').delete().eq('id', id);
+        if (error) {
+          alert("Error deleting record: " + error.message);
+        } else {
+          delete qrInstances[id];
+          fetchEmployees();
+        }
+      }
+    }
+
+    // 4. Download HD QR
+    function downloadQR(id, name) {
+      const qrInstance = qrInstances[id];
+      if (qrInstance) {
+        qrInstance.download({ 
+          name: `Speedex_QR_${name.replace(/\s+/g, '_')}`, 
+          extension: "png" 
+        });
+      }
+    }
+
+    // Initial Load
+    fetchEmployees();
+  </script>
+</body>
+</html>
