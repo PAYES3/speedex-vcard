@@ -5,68 +5,233 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Speedex Digital Business Card</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+    body { font-family: 'Montserrat', sans-serif; }
+
+    #card-qr-box img, #card-qr-box canvas {
+      width: 190px !important;
+      height: 190px !important;
+      image-rendering: pixelated;
+    }
+  </style>
 </head>
-<body class="bg-slate-900 min-h-screen flex items-center justify-center p-4 font-sans">
+<body class="bg-slate-200 min-h-screen flex justify-center items-start sm:py-6">
 
-  <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden border border-slate-100">
-    <!-- Header banner -->
-    <div class="bg-gradient-to-r from-teal-800 to-red-800 p-6 text-white text-center relative">
-      <img src="logo.png" alt="Speedex Logo" class="h-10 mx-auto mb-3 bg-white p-1 rounded">
-      <h2 id="emp-name" class="text-xl font-bold tracking-wide">Loading...</h2>
-      <p id="emp-designation" class="text-xs text-slate-200 mt-1 uppercase tracking-wider font-semibold"></p>
-      <p class="text-xs text-slate-300 mt-0.5 font-medium">Speedex Auto Workshop LLC</p>
+  <div class="w-full max-w-md bg-[#F3F4F6] min-h-screen sm:min-h-0 sm:rounded-[32px] shadow-2xl overflow-hidden relative">
+
+    <!-- Header Logo -->
+    <div class="bg-white py-5 px-4 text-center">
+      <img src="logo.png" alt="Speedex Auto Workshop LLC" class="h-10 mx-auto object-contain" onerror="this.src='https://via.placeholder.com/180x40?text=SPEEDEX'">
     </div>
 
-    <!-- Details -->
-    <div class="p-6 space-y-4">
-      <div class="border-b pb-2">
-        <p class="text-xs text-slate-400 font-bold uppercase">Phone</p>
-        <p id="emp-phone" class="text-sm font-semibold text-slate-800">-</p>
-      </div>
-      <div class="border-b pb-2">
-        <p class="text-xs text-slate-400 font-bold uppercase">Email</p>
-        <p id="emp-email" class="text-sm font-semibold text-slate-800 break-all">-</p>
-      </div>
-      <div class="border-b pb-2">
-        <p class="text-xs text-slate-400 font-bold uppercase">Location</p>
-        <p id="emp-location" class="text-sm font-semibold text-slate-800">-</p>
+    <!-- Profile Header -->
+    <div class="bg-[#6B3020] text-white text-center pt-8 pb-10 px-4 relative">
+      <div class="absolute -top-7 left-1/2 -translate-x-1/2">
+        <div id="emp-avatar" class="w-16 h-16 rounded-full bg-[#404348] border-4 border-white flex items-center justify-center text-white text-xl font-extrabold shadow-md">
+          --
+        </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="pt-2 space-y-3">
-        <!-- Save Contact Button -->
-        <a id="vcf-link" href="#" class="block w-full text-center bg-red-700 hover:bg-red-800 text-white font-bold py-3 rounded-xl shadow transition text-sm">
-          📇 Save to Contacts
-        </a>
+      <h1 id="emp-name" class="text-xl font-extrabold tracking-tight mt-3">Fetching...</h1>
+      <p id="emp-desig" class="text-[11px] font-medium text-slate-200 mt-0.5">---</p>
+      
+      <div class="w-7 h-[1.5px] bg-white/30 mx-auto my-2"></div>
+      
+      <p class="text-[9px] font-bold tracking-widest text-white/90 uppercase">SPEEDEX AUTO WORKSHOP LLC</p>
+      <div class="absolute bottom-0 left-0 right-0 h-3 bg-[#3D5D69]" style="clip-path: polygon(0 100%, 100% 0, 100% 100%);"></div>
+    </div>
 
-        <!-- Download Brochure Button -->
-        <a href="speedex-brochure.pdf" download="Speedex_Brochure.pdf" class="block w-full text-center bg-teal-800 hover:bg-teal-900 text-white font-bold py-3 rounded-xl shadow transition text-sm flex items-center justify-center gap-2">
-          📄 Download Company Brochure
+    <!-- Navigation Tabs -->
+    <div class="px-4 -mt-5 relative z-10">
+      <div class="bg-[#6B3020] rounded-2xl p-1 flex justify-between items-center text-white text-[9px] font-bold shadow-lg">
+        <button id="tab-btn-qr" onclick="switchTab('qr')" class="tab-btn flex-1 py-2.5 rounded-xl flex flex-col items-center gap-1 transition opacity-80 hover:opacity-100">
+          <i class="fa-solid fa-qrcode text-xs"></i>
+          <span>QR CODE</span>
+        </button>
+        <button id="tab-btn-location" onclick="switchTab('location')" class="tab-btn flex-1 py-2.5 rounded-xl flex flex-col items-center gap-1 transition opacity-80 hover:opacity-100">
+          <i class="fa-solid fa-location-dot text-xs"></i>
+          <span>LOCATION</span>
+        </button>
+        <button id="tab-btn-contact" onclick="switchTab('contact')" class="tab-btn flex-1 py-2.5 bg-white text-[#6B3020] rounded-xl flex flex-col items-center gap-1 shadow-md transition">
+          <i class="fa-solid fa-id-card text-xs"></i>
+          <span>CONTACT</span>
+        </button>
+        <button id="tab-btn-enquiry" onclick="switchTab('enquiry')" class="tab-btn flex-1 py-2.5 rounded-xl flex flex-col items-center gap-1 transition opacity-80 hover:opacity-100">
+          <i class="fa-solid fa-circle-question text-xs"></i>
+          <span>ENQUIRY</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 1: QR CODE -->
+    <div id="content-qr" class="tab-content hidden p-5 text-center">
+      <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center">
+        <h2 class="font-bold text-slate-800 text-sm mb-1">Scan Digital Card</h2>
+        <p class="text-[10px] text-slate-400 mb-4">Share this QR Code to open profile</p>
+        <div class="p-3 bg-white border border-slate-200 rounded-2xl shadow-inner flex items-center justify-center">
+          <div id="card-qr-box" class="flex items-center justify-center"></div>
+        </div>
+        <p id="qr-emp-name" class="font-bold text-slate-800 text-xs mt-4"></p>
+        <p id="qr-emp-desig" class="text-[10px] text-[#6B3020] font-semibold"></p>
+      </div>
+    </div>
+
+    <!-- TAB 2: LOCATION -->
+    <div id="content-location" class="tab-content hidden p-5">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 text-center">
+        <h2 class="font-bold text-slate-800 text-sm mb-1">Our Workshop Location</h2>
+        <p id="loc-display-address" class="text-[11px] text-slate-500 mb-4">-</p>
+        <a id="gmap-btn" href="#" target="_blank" class="w-full bg-[#3D5D69] hover:bg-[#2e4751] text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow transition text-xs">
+          <i class="fa-solid fa-diamond-turn-right"></i>
+          <span>Open in Google Maps</span>
         </a>
       </div>
     </div>
+
+    <!-- TAB 3: CONTACT -->
+    <div id="content-contact" class="tab-content p-5">
+      <h2 class="text-center font-extrabold text-slate-800 text-xs mb-4 tracking-wider uppercase">Get In Touch</h2>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-100">
+        <div class="p-3.5 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-[#6B3020] text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-phone text-xs"></i></div>
+          <div>
+            <p class="text-[8px] font-bold text-slate-400 uppercase">MOBILE</p>
+            <a id="emp-phone" href="#" class="text-xs font-bold text-slate-800">-</a>
+          </div>
+        </div>
+        <div class="p-3.5 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-[#6B3020] text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-envelope text-xs"></i></div>
+          <div>
+            <p class="text-[8px] font-bold text-slate-400 uppercase">EMAIL</p>
+            <a id="emp-email" href="#" class="text-xs font-bold text-slate-800">-</a>
+          </div>
+        </div>
+        <div class="p-3.5 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-[#3D5D69] text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-globe text-xs"></i></div>
+          <div>
+            <p class="text-[8px] font-bold text-slate-400 uppercase">WEBSITE</p>
+            <a id="emp-website" href="#" target="_blank" class="text-xs font-bold text-slate-800">-</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 space-y-3">
+        <a id="vcf-btn" href="#" class="w-full bg-[#6B3020] hover:bg-[#522418] text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md transition text-xs">
+          <i class="fa-solid fa-download"></i>
+          <span>Download Contact (vCard)</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- TAB 4: ENQUIRY -->
+    <div id="content-enquiry" class="tab-content hidden p-5">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+        <h2 class="text-center font-bold text-slate-800 text-sm mb-1">Send An Enquiry</h2>
+        <form onsubmit="handleEnquirySubmit(event)" class="space-y-3 mt-3">
+          <input type="text" id="enq-name" required placeholder="Your Name" class="w-full border p-2.5 rounded-xl text-xs">
+          <input type="tel" id="enq-phone" required placeholder="Phone Number" class="w-full border p-2.5 rounded-xl text-xs">
+          <textarea id="enq-msg" rows="3" required placeholder="Message" class="w-full border p-2.5 rounded-xl text-xs"></textarea>
+          <button type="submit" class="w-full bg-[#6B3020] text-white font-bold py-3 rounded-xl text-xs flex justify-center items-center gap-2">
+            <i class="fa-brands fa-whatsapp"></i> Send via WhatsApp
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="bg-[#181A1E] text-white text-center py-4 px-4 text-[9px] text-slate-400">
+      Speedex Auto Workshop LLC
+    </div>
+
   </div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const name = urlParams.get('name') || "Sarala";
-    const desig = urlParams.get('desig') || "Digital Marketing Executive";
-    const comp = "Speedex Auto Workshop LLC";
-    const phone = urlParams.get('phone') || "+971 50 000 0000";
-    const email = urlParams.get('email') || "sarala@speedexauto.com";
-    const loc = urlParams.get('loc') || "Abu Dhabi, UAE";
+    // Config Supabase
+    const SUPABASE_URL = "https://coejwpuctpkymcvzqzwh.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_zxzYhq0Af8HAe4T4k8cpCw_uuC8F79d";
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    document.getElementById('emp-name').innerText = name;
-    document.getElementById('emp-designation').innerText = desig;
-    document.getElementById('emp-phone').innerText = phone;
-    document.getElementById('emp-email').innerText = email;
-    document.getElementById('emp-location').innerText = loc;
+    let activeEmp = null;
 
-    // VCF Contact File Generation
-    const vcfData = `BEGIN:VCARD\nVERSION:3.0\nN:;${name};;;\nFN:${name}\nORG:${comp}\nTITLE:${desig}\nTEL;TYPE=CELL:${phone}\nEMAIL:${email}\nURL:www.speedexgroups.ae\nEND:VCARD`;
-    const blob = new Blob([vcfData], { type: 'text/vcard' });
-    document.getElementById('vcf-link').href = URL.createObjectURL(blob);
-    document.getElementById('vcf-link').download = `${name.replace(/\s+/g, '_')}.vcf`;
+    async function loadCardData() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const empId = urlParams.get('id');
+
+      if (!empId) {
+        document.getElementById('emp-name').innerText = "Card Not Found";
+        return;
+      }
+
+      // Fetch row from Supabase
+      const { data, error } = await _supabase.from('employees').select('*').eq('id', empId).single();
+
+      if (error || !data) {
+        document.getElementById('emp-name').innerText = "Employee Not Found";
+        return;
+      }
+
+      activeEmp = data;
+
+      // Populate UI
+      const initials = data.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+      document.getElementById('emp-avatar').innerText = initials;
+      document.getElementById('emp-name').innerText = data.name;
+      document.getElementById('emp-desig').innerText = data.desig;
+      document.getElementById('qr-emp-name').innerText = data.name;
+      document.getElementById('qr-emp-desig').innerText = data.desig;
+
+      document.getElementById('emp-phone').innerText = data.phone;
+      document.getElementById('emp-phone').href = `tel:${data.phone}`;
+      document.getElementById('emp-email').innerText = data.email;
+      document.getElementById('emp-email').href = `mailto:${data.email}`;
+      document.getElementById('loc-display-address').innerText = data.loc || "Musaffah M38";
+      document.getElementById('gmap-btn').href = data.map_url || "#";
+
+      document.getElementById('emp-website').innerText = data.website || "www.speedexgroups.ae";
+      document.getElementById('emp-website').href = data.website?.startsWith('http') ? data.website : `https://${data.website}`;
+
+      // vCard
+      const vcfData = `BEGIN:VCARD\nVERSION:3.0\nN:;${data.name};;;\nFN:${data.name}\nORG:Speedex Auto Workshop LLC\nTITLE:${data.desig}\nTEL;TYPE=CELL:${data.phone}\nEMAIL:${data.email}\nEND:VCARD`;
+      const blob = new Blob([vcfData], { type: 'text/vcard' });
+      document.getElementById('vcf-btn').href = URL.createObjectURL(blob);
+      document.getElementById('vcf-btn').download = `${data.name.replace(/\s+/g, '_')}.vcf`;
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`content-${tab}`).classList.remove('hidden');
+
+      if(tab === 'qr') {
+        const qrBox = document.getElementById('card-qr-box');
+        qrBox.innerHTML = "";
+        new QRCode(qrBox, {
+          text: window.location.href,
+          width: 280,
+          height: 280,
+          colorDark: "#181A1E",
+          colorLight: "#FFFFFF",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      }
+    }
+
+    function handleEnquirySubmit(e) {
+      e.preventDefault();
+      if(!activeEmp) return;
+      const cName = document.getElementById('enq-name').value;
+      const cPhone = document.getElementById('enq-phone').value;
+      const cMsg = document.getElementById('enq-msg').value;
+
+      const textMessage = `Hello ${activeEmp.name},\nEnquiry:\nName: ${cName}\nPhone: ${cPhone}\nMsg: ${cMsg}`;
+      const cleanPhone = activeEmp.phone.replace(/[^0-9]/g, '');
+      window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(textMessage)}`, '_blank');
+    }
+
+    window.onload = loadCardData;
   </script>
 </body>
 </html>
