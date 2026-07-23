@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <!-- Supabase JS Client -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
@@ -21,7 +21,8 @@
 </head>
 <body class="bg-slate-200 min-h-screen flex justify-center items-start sm:py-6">
 
-  <div class="w-full max-w-md bg-[#F3F4F6] min-h-screen sm:min-h-0 sm:rounded-[32px] shadow-2xl overflow-hidden relative">
+  <!-- Main Digital Card Container -->
+  <div id="digital-card" class="w-full max-w-md bg-[#F3F4F6] min-h-screen sm:min-h-0 sm:rounded-[32px] shadow-2xl overflow-hidden relative">
 
     <!-- Header Logo -->
     <div class="bg-white py-5 px-4 text-center">
@@ -31,7 +32,8 @@
     <!-- Profile Header -->
     <div class="bg-[#6B3020] text-white text-center pt-8 pb-10 px-4 relative">
       <div class="absolute -top-7 left-1/2 -translate-x-1/2">
-        <div id="emp-avatar" class="w-16 h-16 rounded-full bg-[#404348] border-4 border-white flex items-center justify-center text-white text-xl font-extrabold shadow-md">
+        <!-- Profile Avatar Box (Photo or Initials) -->
+        <div id="emp-avatar" class="w-16 h-16 rounded-full bg-[#404348] border-4 border-white flex items-center justify-center text-white text-xl font-extrabold shadow-md overflow-hidden">
           --
         </div>
       </div>
@@ -56,7 +58,7 @@
           <i class="fa-solid fa-location-dot text-xs"></i>
           <span>LOCATION</span>
         </button>
-        <button id="tab-btn-contact" onclick="switchTab('contact')" class="tab-btn flex-1 py-2.5 bg-white text-[#6B3020] rounded-xl flex flex-col items-center gap-1 shadow-md transition">
+        <button id="tab-btn-contact" onclick="switchTab('contact')" class="tab-btn flex-1 py-2.5 bg-white text-[#6B3020] rounded-xl flex flex-col items-center gap-1 shadow-md transition font-bold">
           <i class="fa-solid fa-id-card text-xs"></i>
           <span>CONTACT</span>
         </button>
@@ -72,9 +74,14 @@
       <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center">
         <h2 class="font-bold text-slate-800 text-sm mb-1">Scan Digital Card</h2>
         <p class="text-[10px] text-slate-400 mb-4">Share this QR Code to open profile</p>
+        
         <div class="p-3 bg-white border border-slate-200 rounded-2xl shadow-inner flex items-center justify-center">
-          <div id="card-qr-box" class="flex items-center justify-center"></div>
+          <div class="relative inline-block">
+            <div id="card-qr-box" class="flex items-center justify-center"></div>
+            <img id="card-center-logo" src="logo.png" alt="Logo" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white p-1 rounded-xl border border-slate-200 shadow-md object-contain pointer-events-none">
+          </div>
         </div>
+
         <p id="qr-emp-name" class="font-bold text-slate-800 text-xs mt-4"></p>
         <p id="qr-emp-desig" class="text-[10px] text-[#6B3020] font-semibold"></p>
       </div>
@@ -119,10 +126,21 @@
         </div>
       </div>
 
+      <!-- Action Buttons -->
       <div class="mt-6 space-y-3">
-        <a id="vcf-btn" href="#" class="w-full bg-[#6B3020] hover:bg-[#522418] text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md transition text-xs">
-          <i class="fa-solid fa-download"></i>
-          <span>Download Contact (vCard)</span>
+        <button onclick="downloadCardAsImage()" class="w-full bg-[#6B3020] hover:bg-[#522418] text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md transition text-xs">
+          <i class="fa-solid fa-image"></i>
+          <span>Download Digital Card (Image)</span>
+        </button>
+
+        <button onclick="downloadBrochureFile()" class="w-full bg-[#3D5D69] hover:bg-[#2e4751] text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md transition text-xs">
+          <i class="fa-solid fa-file-pdf"></i>
+          <span>Download Company Brochure</span>
+        </button>
+
+        <a id="vcf-btn" href="#" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm transition text-[11px]">
+          <i class="fa-solid fa-address-card"></i>
+          <span>Save Contact to Phone (vCard)</span>
         </a>
       </div>
     </div>
@@ -142,16 +160,27 @@
       </div>
     </div>
 
-    <div class="bg-[#181A1E] text-white text-center py-4 px-4 text-[9px] text-slate-400">
-      Speedex Auto Workshop LLC
+    <!-- Footer with Social Icons -->
+    <div class="bg-[#181A1E] text-white text-center py-5 px-4">
+      <div class="flex justify-center items-center gap-4 mb-3">
+        <a id="social-insta" href="https://instagram.com" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#6B3020] transition text-white text-sm">
+          <i class="fa-brands fa-instagram"></i>
+        </a>
+        <a id="social-youtube" href="https://youtube.com" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#6B3020] transition text-white text-sm">
+          <i class="fa-brands fa-youtube"></i>
+        </a>
+        <a id="social-linkedin" href="https://linkedin.com" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#6B3020] transition text-white text-sm">
+          <i class="fa-brands fa-linkedin-in"></i>
+        </a>
+      </div>
+      <p class="text-[9px] font-bold text-slate-400 tracking-wider uppercase">Speedex Auto Workshop LLC</p>
     </div>
 
   </div>
 
   <script>
-    // Supabase Connection Settings
     const SUPABASE_URL = "https://coejwpuctpkymcvzqzwh.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_zxzYhq0Af8HAe4T4k8cpCw_uuC8F79d"; // Replace with sb_publishable_...
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY"; // Replace with sb_publishable_...
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let activeEmp = null;
@@ -165,7 +194,6 @@
         return;
       }
 
-      // Fetch row from Supabase
       const { data, error } = await _supabase.from('employees').select('*').eq('id', empId).single();
 
       if (error || !data) {
@@ -175,9 +203,16 @@
 
       activeEmp = data;
 
-      // Populate UI
+      // Profile Photo or Initials Logic
+      const avatarBox = document.getElementById('emp-avatar');
       const initials = data.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
-      document.getElementById('emp-avatar').innerText = initials;
+
+      if (data.photo_url) {
+        avatarBox.innerHTML = `<img src="${data.photo_url}" alt="${data.name}" class="w-full h-full object-cover rounded-full" crossorigin="anonymous" onerror="this.onerror=null; this.parentElement.innerText='${initials}';">`;
+      } else {
+        avatarBox.innerText = initials;
+      }
+
       document.getElementById('emp-name').innerText = data.name;
       document.getElementById('emp-desig').innerText = data.desig;
       document.getElementById('qr-emp-name').innerText = data.name;
@@ -193,6 +228,10 @@
       document.getElementById('emp-website').innerText = data.website || "www.speedexgroups.ae";
       document.getElementById('emp-website').href = data.website?.startsWith('http') ? data.website : `https://${data.website}`;
 
+      if (data.insta) {
+        document.getElementById('social-insta').href = data.insta;
+      }
+
       // vCard
       const vcfData = `BEGIN:VCARD\nVERSION:3.0\nN:;${data.name};;;\nFN:${data.name}\nORG:Speedex Auto Workshop LLC\nTITLE:${data.desig}\nTEL;TYPE=CELL:${data.phone}\nEMAIL:${data.email}\nEND:VCARD`;
       const blob = new Blob([vcfData], { type: 'text/vcard' });
@@ -204,11 +243,23 @@
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       document.getElementById(`content-${tab}`).classList.remove('hidden');
 
+      const tabList = ['qr', 'location', 'contact', 'enquiry'];
+      tabList.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (btn) {
+          if (t === tab) {
+            btn.className = "tab-btn flex-1 py-2.5 bg-white text-[#6B3020] rounded-xl flex flex-col items-center gap-1 shadow-md transition font-bold";
+          } else {
+            btn.className = "tab-btn flex-1 py-2.5 rounded-xl flex flex-col items-center gap-1 transition opacity-80 hover:opacity-100 text-white";
+          }
+        }
+      });
+
       if(tab === 'qr') {
         const qrBox = document.getElementById('card-qr-box');
         qrBox.innerHTML = "";
 
-        const qr = new QRCode(qrBox, {
+        new QRCode(qrBox, {
           text: window.location.href,
           width: 220,
           height: 220,
@@ -217,32 +268,29 @@
           correctLevel: QRCode.CorrectLevel.H
         });
 
-        setTimeout(() => {
-          const canvas = qrBox.querySelector('canvas');
-          if (canvas) {
-            const ctx = canvas.getContext('2d');
-            const logo = new Image();
-            logo.src = 'logo.png';
-
-            logo.onload = function () {
-              const logoSize = canvas.width * 0.22;
-              const x = (canvas.width - logoSize) / 2;
-              const y = (canvas.height - logoSize) / 2;
-
-              ctx.fillStyle = '#FFFFFF';
-              if (ctx.roundRect) {
-                ctx.beginPath();
-                ctx.roundRect(x - 5, y - 5, logoSize + 10, logoSize + 10, 8);
-                ctx.fill();
-              } else {
-                ctx.fillRect(x - 5, y - 5, logoSize + 10, logoSize + 10);
-              }
-
-              ctx.drawImage(logo, x, y, logoSize, logoSize);
-            };
-          }
-        }, 100);
+        document.getElementById('card-center-logo').classList.remove('hidden');
       }
+    }
+
+    function downloadCardAsImage() {
+      const cardElement = document.getElementById('digital-card');
+      const filename = activeEmp ? `${activeEmp.name.replace(/\s+/g, '_')}_Speedex_Card.png` : 'Speedex_Card.png';
+      
+      html2canvas(cardElement, { scale: 2, useCORS: true }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    }
+
+    function downloadBrochureFile() {
+      const fileUrl = (activeEmp && activeEmp.brochure) ? activeEmp.brochure : 'speedex-brochure.pdf';
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = fileUrl.split('/').pop();
+      link.target = '_blank';
+      link.click();
     }
 
     function handleEnquirySubmit(e) {
