@@ -17,10 +17,11 @@
 <body class="bg-slate-100 min-h-screen p-4 sm:p-8">
 
   <div class="max-w-4xl mx-auto">
+    <!-- Header Bar -->
     <div class="bg-[#181A1E] text-white p-6 rounded-2xl shadow-lg mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div>
         <h1 class="text-xl font-bold">Speedex Card Dashboard</h1>
-        <p class="text-xs text-slate-400 mt-1">Supabase DB Live Connection & High-Res QR Generator</p>
+        <p class="text-xs text-slate-400 mt-1">Supabase DB Live Connection & Center Logo QR Generator</p>
       </div>
       <span class="bg-[#6B3020] px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider">Admin Panel</span>
     </div>
@@ -33,7 +34,7 @@
         <form id="cardForm" class="space-y-4">
           <div>
             <label class="block text-xs font-bold text-slate-600 mb-1">Vercel Domain Base URL</label>
-            <input type="text" id="in-baseUrl" value="https://your-project.vercel.app/index.html" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
+            <input type="text" id="in-baseUrl" value="https://speedex-vcard.vercel.app/index.html" class="w-full border border-slate-300 p-2.5 rounded-xl text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -95,10 +96,10 @@
       <!-- Output Panel -->
       <div class="lg:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center justify-between">
         <div class="w-full text-center">
-          <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 border-b pb-2">Generated Sharp QR</h2>
+          <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 border-b pb-2">Generated QR (with Logo)</h2>
           
           <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 inline-block shadow-inner mb-4">
-            <div id="dashboard-qr" class="flex items-center justify-center min-w-[200px] min-h-[200px]">
+            <div id="dashboard-qr" class="flex items-center justify-center min-w-[260px] min-h-[260px]">
               <span class="text-xs text-slate-400">Fill form and click Save</span>
             </div>
           </div>
@@ -125,9 +126,9 @@
   </div>
 
   <script>
-    // Config Supabase
+    // Supabase Connection Settings
     const SUPABASE_URL = "https://coejwpuctpkymcvzqzwh.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_zxzYhq0Af8HAe4T4k8cpCw_uuC8F79d";
+    const SUPABASE_ANON_KEY = "sb_publishable_zxzYhq0Af8HAe4T4k8cpCw_uuC8F79d"; // Replace with sb_publishable_...
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     async function saveToSupabase() {
@@ -162,17 +163,44 @@
         testBtn.href = cardUrl;
         testBtn.classList.remove('pointer-events-none', 'opacity-50');
 
-        // Render Crisp QR Code
+        // Render QR Code with Logo in Center
         const qrBox = document.getElementById('dashboard-qr');
         qrBox.innerHTML = "";
-        new QRCode(qrBox, {
+
+        const qr = new QRCode(qrBox, {
           text: cardUrl,
           width: 260,
           height: 260,
           colorDark: "#181A1E",
           colorLight: "#FFFFFF",
-          correctLevel: QRCode.CorrectLevel.M
+          correctLevel: QRCode.CorrectLevel.H
         });
+
+        setTimeout(() => {
+          const canvas = qrBox.querySelector('canvas');
+          if (canvas) {
+            const ctx = canvas.getContext('2d');
+            const logo = new Image();
+            logo.src = 'logo.png';
+
+            logo.onload = function () {
+              const logoSize = canvas.width * 0.22;
+              const x = (canvas.width - logoSize) / 2;
+              const y = (canvas.height - logoSize) / 2;
+
+              ctx.fillStyle = '#FFFFFF';
+              if (ctx.roundRect) {
+                ctx.beginPath();
+                ctx.roundRect(x - 5, y - 5, logoSize + 10, logoSize + 10, 8);
+                ctx.fill();
+              } else {
+                ctx.fillRect(x - 5, y - 5, logoSize + 10, logoSize + 10);
+              }
+
+              ctx.drawImage(logo, x, y, logoSize, logoSize);
+            };
+          }
+        }, 100);
 
       } catch (err) {
         alert("Error saving data: " + err.message);
