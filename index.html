@@ -14,9 +14,8 @@
     body { font-family: 'Montserrat', sans-serif; }
 
     #card-qr-box img, #card-qr-box canvas {
-      width: 190px !important;
-      height: 190px !important;
-      image-rendering: pixelated;
+      width: 220px !important;
+      height: 220px !important;
     }
   </style>
 </head>
@@ -150,9 +149,9 @@
   </div>
 
   <script>
-    // Config Supabase
+    // Supabase Connection Settings
     const SUPABASE_URL = "https://coejwpuctpkymcvzqzwh.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_zxzYhq0Af8HAe4T4k8cpCw_uuC8F79d";
+    const SUPABASE_ANON_KEY = "sb_publishable_zxzYhq0Af8HAe4T4k8cpCw_uuC8F79d"; // Replace with sb_publishable_...
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let activeEmp = null;
@@ -208,14 +207,41 @@
       if(tab === 'qr') {
         const qrBox = document.getElementById('card-qr-box');
         qrBox.innerHTML = "";
-        new QRCode(qrBox, {
+
+        const qr = new QRCode(qrBox, {
           text: window.location.href,
-          width: 280,
-          height: 280,
+          width: 220,
+          height: 220,
           colorDark: "#181A1E",
           colorLight: "#FFFFFF",
-          correctLevel: QRCode.CorrectLevel.M
+          correctLevel: QRCode.CorrectLevel.H
         });
+
+        setTimeout(() => {
+          const canvas = qrBox.querySelector('canvas');
+          if (canvas) {
+            const ctx = canvas.getContext('2d');
+            const logo = new Image();
+            logo.src = 'logo.png';
+
+            logo.onload = function () {
+              const logoSize = canvas.width * 0.22;
+              const x = (canvas.width - logoSize) / 2;
+              const y = (canvas.height - logoSize) / 2;
+
+              ctx.fillStyle = '#FFFFFF';
+              if (ctx.roundRect) {
+                ctx.beginPath();
+                ctx.roundRect(x - 5, y - 5, logoSize + 10, logoSize + 10, 8);
+                ctx.fill();
+              } else {
+                ctx.fillRect(x - 5, y - 5, logoSize + 10, logoSize + 10);
+              }
+
+              ctx.drawImage(logo, x, y, logoSize, logoSize);
+            };
+          }
+        }, 100);
       }
     }
 
