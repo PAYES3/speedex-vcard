@@ -133,7 +133,7 @@
 
         <!-- Action Buttons -->
         <div class="w-full space-y-2 mt-6">
-          <button onclick="downloadQR()" class="w-full bg-[#6B3020] hover:bg-[#522418] text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition">
+          <button onclick="downloadQRWithLogo()" class="w-full bg-[#6B3020] hover:bg-[#522418] text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition">
             <i class="fa-solid fa-download"></i> Download QR Code Image
           </button>
           <button onclick="copyCardLink()" class="w-full bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition">
@@ -240,13 +240,52 @@
       }
     }
 
-    function downloadQR() {
+    // Canvas-ல் Logo வரைந்து QR பதிவிறக்கும் செயல்பாடு
+    function downloadQRWithLogo() {
       const qrCanvas = document.querySelector('#qr-box canvas');
+      const logoImg = document.getElementById('qr-center-logo');
+
       if (!qrCanvas) return alert("Generate QR first!");
-      const link = document.createElement('a');
-      link.download = 'Company_QR.png';
-      link.href = qrCanvas.toDataURL('image/png');
-      link.click();
+
+      // புதிய Temp Canvas உருவாக்கி அதில் QR + Logo இரண்டையும் வரைகிறோம்
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+
+      const size = 600; // உயர் தரமுள்ள படத்தை உருவாக்க Size 600px
+      canvas.width = size;
+      canvas.height = size;
+
+      // 1. QR Code-ஐ Canvas-ல் வரைதல்
+      ctx.drawImage(qrCanvas, 0, 0, size, size);
+
+      // 2. Logo-வுக்கான White Box வரைதல்
+      const logoWidth = size * 0.35;
+      const logoHeight = size * 0.16;
+      const x = (size - logoWidth) / 2;
+      const y = (size - logoHeight) / 2;
+
+      ctx.fillStyle = "#FFFFFF";
+      ctx.fillRect(x - 5, y - 5, logoWidth + 10, logoHeight + 10);
+
+      // Border வரைதல்
+      ctx.strokeStyle = "#CBD5E1";
+      ctx.lineWidth = 4;
+      ctx.strokeRect(x - 5, y - 5, logoWidth + 10, logoHeight + 10);
+
+      // 3. Logo வரைதல்
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = logoImg.src;
+
+      img.onload = function () {
+        ctx.drawImage(img, x, y, logoWidth, logoHeight);
+
+        // Download செயலியை இயக்குதல்
+        const link = document.createElement('a');
+        link.download = 'Company_QR_With_Logo.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      };
     }
 
     function copyCardLink() {
