@@ -93,7 +93,7 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Google Maps Link</label>
-              <input type="url" id="emp-map-input" placeholder="https://maps.google.com/..." class="w-full border border-slate-300 rounded-xl p-3 text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
+              <input type="url" id="emp-map-input" value="https://maps.google.com/?q=Speedex+Auto+Workshop+Musaffah+M38+Abu+Dhabi" class="w-full border border-slate-300 rounded-xl p-3 text-xs focus:ring-2 focus:ring-[#6B3020] outline-none">
             </div>
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1">Website</label>
@@ -133,8 +133,8 @@
 
         <!-- Action Buttons -->
         <div class="w-full space-y-2 mt-6">
-          <button onclick="downloadQRWithLogo()" class="w-full bg-[#6B3020] hover:bg-[#522418] text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition">
-            <i class="fa-solid fa-download"></i> Download QR Code Image
+          <button onclick="downloadQRWithHDLogo()" class="w-full bg-[#6B3020] hover:bg-[#522418] text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition">
+            <i class="fa-solid fa-download"></i> Download High-Res QR Code Image
           </button>
           <button onclick="copyCardLink()" class="w-full bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition">
             <i class="fa-solid fa-copy"></i> Copy Card Link
@@ -154,7 +154,6 @@
     const SUPABASE_ANON_KEY = "sb_publishable_zxzYhq0Af8HAe4T4k8cpCw_uuC8F79d";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Exact File Mappings (.jpg extensions)
     const companyLogoMap = {
       "1. Speedex Auto Workshop LLC": "logo.png",
       "2. Arabsat Transport Passengers by Buses": "arabsat-logo.jpg",
@@ -240,39 +239,40 @@
       }
     }
 
-    // Canvas-ல் Logo வரைந்து QR பதிவிறக்கும் செயல்பாடு
-    function downloadQRWithLogo() {
+    // High Resolution HD Clear Download
+    function downloadQRWithHDLogo() {
       const qrCanvas = document.querySelector('#qr-box canvas');
       const logoImg = document.getElementById('qr-center-logo');
 
       if (!qrCanvas) return alert("Generate QR first!");
 
-      // புதிய Temp Canvas உருவாக்கி அதில் QR + Logo இரண்டையும் வரைகிறோம்
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
 
-      const size = 600; // உயர் தரமுள்ள படத்தை உருவாக்க Size 600px
+      const size = 2400; // Ultra HD Canvas
       canvas.width = size;
       canvas.height = size;
 
-      // 1. QR Code-ஐ Canvas-ல் வரைதல்
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      // 1. Draw QR Code
       ctx.drawImage(qrCanvas, 0, 0, size, size);
 
-      // 2. Logo-வுக்கான White Box வரைதல்
+      // 2. Draw White Center Box
       const logoWidth = size * 0.35;
       const logoHeight = size * 0.16;
       const x = (size - logoWidth) / 2;
       const y = (size - logoHeight) / 2;
 
       ctx.fillStyle = "#FFFFFF";
-      ctx.fillRect(x - 5, y - 5, logoWidth + 10, logoHeight + 10);
+      ctx.fillRect(x - 20, y - 20, logoWidth + 40, logoHeight + 40);
 
-      // Border வரைதல்
       ctx.strokeStyle = "#CBD5E1";
-      ctx.lineWidth = 4;
-      ctx.strokeRect(x - 5, y - 5, logoWidth + 10, logoHeight + 10);
+      ctx.lineWidth = 12;
+      ctx.strokeRect(x - 20, y - 20, logoWidth + 40, logoHeight + 40);
 
-      // 3. Logo வரைதல்
+      // 3. Render High Quality Logo
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.src = logoImg.src;
@@ -280,10 +280,9 @@
       img.onload = function () {
         ctx.drawImage(img, x, y, logoWidth, logoHeight);
 
-        // Download செயலியை இயக்குதல்
         const link = document.createElement('a');
-        link.download = 'Company_QR_With_Logo.png';
-        link.href = canvas.toDataURL('image/png');
+        link.download = 'Speedex_HD_QR_Code.png';
+        link.href = canvas.toDataURL('image/png', 1.0);
         link.click();
       };
     }
