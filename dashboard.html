@@ -7,6 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
@@ -108,14 +109,13 @@
         <div class="w-full text-center">
           <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4 border-b pb-2">Generated QR (Company Center Logo)</h2>
           
-          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 inline-block shadow-inner mb-4">
-            <div class="relative inline-block">
+          <div id="qr-container-wrapper" class="bg-slate-50 p-4 rounded-2xl border border-slate-200 inline-block shadow-inner mb-4">
+            <div id="qr-wrapper-element" class="relative inline-block bg-white p-2 rounded-xl">
               <div id="dashboard-qr" class="flex items-center justify-center min-w-[260px] min-h-[260px]">
                 <span class="text-xs text-slate-400">Fill form and click Save</span>
               </div>
-              <!-- Center Logo Container matching user screenshot style -->
               <div id="qr-center-logo-box" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 py-1 rounded-md border border-slate-300 shadow-md flex items-center justify-center max-w-[130px] max-h-[50px]">
-                <img id="qr-center-logo" src="" alt="Logo" class="max-w-[110px] max-h-[36px] object-contain">
+                <img id="qr-center-logo" src="logo.png" alt="Logo" class="max-w-[110px] max-h-[36px] object-contain">
               </div>
             </div>
           </div>
@@ -127,6 +127,11 @@
         </div>
 
         <div class="w-full space-y-2 mt-6">
+          <button id="download-qr-btn" onclick="downloadQrCode()" class="w-full bg-[#6B3020] hover:bg-[#522418] text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition pointer-events-none opacity-50">
+            <i class="fa-solid fa-download"></i>
+            <span>Download QR Code Image</span>
+          </button>
+
           <button onclick="copyGeneratedUrl()" class="w-full bg-[#3D5D69] hover:bg-[#2e4751] text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition">
             <i class="fa-solid fa-copy"></i>
             <span>Copy Card Link</span>
@@ -143,13 +148,33 @@
 
   <script>
     const SUPABASE_URL = "https://coejwpuctpkymcvzqzwh.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_zxzYhq0Af8HAe4T4k8cpCw_uuC8F79d"; // Put your anon public key
+    const SUPABASE_ANON_KEY = "sb_publishable_zxzYhq0Af8HAe4T4k8cpCw_uuC8F79d";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const brochureMap = {
+      "Speedex AutoWorkshop": "speedex-brochure.pdf",
+      "Arabsat Transport Passengers by Buses": "Arabsat Brouchure.pdf",
+      "Excellent General Trading": "excellent GT Brochure A4.pdf",
+      "Speedex Signages": "Signages Brouchure.pdf",
+      "Speedex Cars Rental": "Cars rental Brouchure.pdf",
+      "Excellent Field Contracting": "EXCELLENT FEILD CONTRACT BROCHURE.pdf",
+      "Speedex Facility Management": "Spdx Facilities Mangement Brouchure.pdf",
+      "Excellent Group of Companies": "speedex-brochure.pdf"
+    };
+
+    function convertFileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
 
     async function saveToSupabase() {
       const btn = document.getElementById('submit-btn');
       btn.disabled = true;
-      btn.innerText = "Saving to Supabase...";
+      btn.innerText = "Processing & Saving...";
 
       try {
         let finalPhotoUrl = document.getElementById('in-photoUrl').value.trim();
@@ -157,18 +182,24 @@
 
         if (fileInput.files.length > 0) {
           const file = fileInput.files[0];
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-          const filePath = `profiles/${fileName}`;
+          try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const filePath = `profiles/${fileName}`;
 
-          const { error: uploadError } = await _supabase.storage.from('avatars').upload(filePath, file);
-          if (uploadError) throw new Error("Photo Upload Failed: " + uploadError.message);
+            const { error: uploadError } = await _supabase.storage.from('avatars').upload(filePath, file);
+            if (uploadError) throw uploadError;
 
-          const { data: publicUrlData } = _supabase.storage.from('avatars').getPublicUrl(filePath);
-          finalPhotoUrl = publicUrlData.publicUrl;
+            const { data: publicUrlData } = _supabase.storage.from('avatars').getPublicUrl(filePath);
+            finalPhotoUrl = publicUrlData.publicUrl;
+          } catch (storageErr) {
+            console.warn("Storage upload fallback to base64:", storageErr.message);
+            finalPhotoUrl = await convertFileToBase64(file);
+          }
         }
 
         const selectedCompany = document.getElementById('in-company').value;
+        const selectedBrochure = brochureMap[selectedCompany] || "speedex-brochure.pdf";
 
         const payload = {
           company: selectedCompany,
@@ -180,7 +211,7 @@
           loc: document.getElementById('in-loc').value.trim(),
           map_url: document.getElementById('in-mapUrl').value.trim(),
           website: document.getElementById('in-website').value.trim(),
-          brochure: `brochures/${selectedCompany}.pdf`,
+          brochure: selectedBrochure,
           insta: "https://instagram.com"
         };
 
@@ -197,6 +228,9 @@
         testBtn.href = cardUrl;
         testBtn.classList.remove('pointer-events-none', 'opacity-50');
 
+        const downloadQrBtn = document.getElementById('download-qr-btn');
+        downloadQrBtn.classList.remove('pointer-events-none', 'opacity-50');
+
         const qrBox = document.getElementById('dashboard-qr');
         qrBox.innerHTML = "";
 
@@ -210,16 +244,27 @@
         });
 
         const logoImg = document.getElementById('qr-center-logo');
-        logoImg.src = `logos/${selectedCompany}.png`;
-        logoImg.onerror = function() { this.src = 'logo.png'; };
+        logoImg.src = "logo.png";
         document.getElementById('qr-center-logo-box').classList.remove('hidden');
 
       } catch (err) {
-        alert("Error: " + err.message);
+        alert("Error saving data: " + err.message);
       } finally {
         btn.disabled = false;
         btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i><span>Save to Supabase & Generate QR</span>`;
       }
+    }
+
+    function downloadQrCode() {
+      const qrElement = document.getElementById('qr-wrapper-element');
+      const empName = document.getElementById('in-name').value.trim() || "Speedex";
+      
+      html2canvas(qrElement, { scale: 3, useCORS: true }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `${empName.replace(/\s+/g, '_')}_QR_Code.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
     }
 
     function copyGeneratedUrl() {
