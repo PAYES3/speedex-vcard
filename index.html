@@ -21,18 +21,16 @@
 </head>
 <body class="bg-slate-200 min-h-screen flex justify-center items-start sm:py-6">
 
-  <!-- Main Digital Card Container -->
   <div id="digital-card" class="w-full max-w-md bg-[#F3F4F6] min-h-screen sm:min-h-0 sm:rounded-[32px] shadow-2xl overflow-hidden relative">
 
-    <!-- Header Logo -->
-    <div class="bg-white py-5 px-4 text-center">
-      <img src="logo.png" alt="Speedex Auto Workshop LLC" class="h-10 mx-auto object-contain" onerror="this.src='https://via.placeholder.com/180x40?text=SPEEDEX'">
+    <!-- Dynamic Header Logo -->
+    <div class="bg-white py-5 px-4 text-center border-b border-slate-100">
+      <img id="card-header-logo" src="logo.png" alt="Company Logo" class="h-10 mx-auto object-contain">
     </div>
 
     <!-- Profile Header -->
     <div class="bg-[#6B3020] text-white text-center pt-8 pb-10 px-4 relative">
       <div class="absolute -top-7 left-1/2 -translate-x-1/2">
-        <!-- Profile Avatar Box (Photo or Initials) -->
         <div id="emp-avatar" class="w-16 h-16 rounded-full bg-[#404348] border-4 border-white flex items-center justify-center text-white text-xl font-extrabold shadow-md overflow-hidden">
           --
         </div>
@@ -43,7 +41,7 @@
       
       <div class="w-7 h-[1.5px] bg-white/30 mx-auto my-2"></div>
       
-      <p class="text-[9px] font-bold tracking-widest text-white/90 uppercase">SPEEDEX AUTO WORKSHOP LLC</p>
+      <p id="emp-company" class="text-[9px] font-bold tracking-widest text-white/90 uppercase">SPEEDEX AUTO WORKSHOP LLC</p>
       <div class="absolute bottom-0 left-0 right-0 h-3 bg-[#3D5D69]" style="clip-path: polygon(0 100%, 100% 0, 100% 100%);"></div>
     </div>
 
@@ -78,7 +76,10 @@
         <div class="p-3 bg-white border border-slate-200 rounded-2xl shadow-inner flex items-center justify-center">
           <div class="relative inline-block">
             <div id="card-qr-box" class="flex items-center justify-center"></div>
-            <img id="card-center-logo" src="logo.png" alt="Logo" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white p-1 rounded-xl border border-slate-200 shadow-md object-contain pointer-events-none">
+            <!-- Center Logo Overlay -->
+            <div id="card-center-logo-box" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 py-1 rounded-md border border-slate-300 shadow-md flex items-center justify-center max-w-[110px] max-h-[44px]">
+              <img id="card-center-logo" src="" alt="Logo" class="max-w-[95px] max-h-[30px] object-contain pointer-events-none">
+            </div>
           </div>
         </div>
 
@@ -90,7 +91,7 @@
     <!-- TAB 2: LOCATION -->
     <div id="content-location" class="tab-content hidden p-5">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 text-center">
-        <h2 class="font-bold text-slate-800 text-sm mb-1">Our Workshop Location</h2>
+        <h2 class="font-bold text-slate-800 text-sm mb-1">Our Location</h2>
         <p id="loc-display-address" class="text-[11px] text-slate-500 mb-4">-</p>
         <a id="gmap-btn" href="#" target="_blank" class="w-full bg-[#3D5D69] hover:bg-[#2e4751] text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow transition text-xs">
           <i class="fa-solid fa-diamond-turn-right"></i>
@@ -126,7 +127,6 @@
         </div>
       </div>
 
-      <!-- Action Buttons -->
       <div class="mt-6 space-y-3">
         <button onclick="downloadCardAsImage()" class="w-full bg-[#6B3020] hover:bg-[#522418] text-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md transition text-xs">
           <i class="fa-solid fa-image"></i>
@@ -135,7 +135,7 @@
 
         <button onclick="downloadBrochureFile()" class="w-full bg-[#3D5D69] hover:bg-[#2e4751] text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-md transition text-xs">
           <i class="fa-solid fa-file-pdf"></i>
-          <span>Download Company Brochure</span>
+          <span id="brochure-btn-text">Download Company Brochure</span>
         </button>
 
         <a id="vcf-btn" href="#" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm transition text-[11px]">
@@ -160,27 +160,20 @@
       </div>
     </div>
 
-    <!-- Footer with Social Icons -->
     <div class="bg-[#181A1E] text-white text-center py-5 px-4">
       <div class="flex justify-center items-center gap-4 mb-3">
         <a id="social-insta" href="https://instagram.com" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#6B3020] transition text-white text-sm">
           <i class="fa-brands fa-instagram"></i>
         </a>
-        <a id="social-youtube" href="https://youtube.com" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#6B3020] transition text-white text-sm">
-          <i class="fa-brands fa-youtube"></i>
-        </a>
-        <a id="social-linkedin" href="https://linkedin.com" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#6B3020] transition text-white text-sm">
-          <i class="fa-brands fa-linkedin-in"></i>
-        </a>
       </div>
-      <p class="text-[9px] font-bold text-slate-400 tracking-wider uppercase">Speedex Auto Workshop LLC</p>
+      <p id="footer-company-name" class="text-[9px] font-bold text-slate-400 tracking-wider uppercase">Speedex Auto Workshop LLC</p>
     </div>
 
   </div>
 
   <script>
     const SUPABASE_URL = "https://coejwpuctpkymcvzqzwh.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_zxzYhq0Af8HAe4T4k8cpCw_uuC8F79d"; // Replace with sb_publishable_...
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY_HERE"; // Put your anon public key
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let activeEmp = null;
@@ -203,7 +196,12 @@
 
       activeEmp = data;
 
-      // Profile Photo or Initials Logic
+      const compName = data.company || "Speedex AutoWorkshop";
+      document.getElementById('emp-company').innerText = compName;
+      document.getElementById('footer-company-name').innerText = compName;
+      document.getElementById('card-header-logo').src = `logos/${compName}.png`;
+      document.getElementById('card-header-logo').onerror = function() { this.src = 'logo.png'; };
+
       const avatarBox = document.getElementById('emp-avatar');
       const initials = data.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
 
@@ -222,18 +220,13 @@
       document.getElementById('emp-phone').href = `tel:${data.phone}`;
       document.getElementById('emp-email').innerText = data.email;
       document.getElementById('emp-email').href = `mailto:${data.email}`;
-      document.getElementById('loc-display-address').innerText = data.loc || "Musaffah M38";
+      document.getElementById('loc-display-address').innerText = data.loc || "Abu Dhabi";
       document.getElementById('gmap-btn').href = data.map_url || "#";
 
       document.getElementById('emp-website').innerText = data.website || "www.speedexgroups.ae";
       document.getElementById('emp-website').href = data.website?.startsWith('http') ? data.website : `https://${data.website}`;
 
-      if (data.insta) {
-        document.getElementById('social-insta').href = data.insta;
-      }
-
-      // vCard
-      const vcfData = `BEGIN:VCARD\nVERSION:3.0\nN:;${data.name};;;\nFN:${data.name}\nORG:Speedex Auto Workshop LLC\nTITLE:${data.desig}\nTEL;TYPE=CELL:${data.phone}\nEMAIL:${data.email}\nEND:VCARD`;
+      const vcfData = `BEGIN:VCARD\nVERSION:3.0\nN:;${data.name};;;\nFN:${data.name}\nORG:${compName}\nTITLE:${data.desig}\nTEL;TYPE=CELL:${data.phone}\nEMAIL:${data.email}\nEND:VCARD`;
       const blob = new Blob([vcfData], { type: 'text/vcard' });
       document.getElementById('vcf-btn').href = URL.createObjectURL(blob);
       document.getElementById('vcf-btn').download = `${data.name.replace(/\s+/g, '_')}.vcf`;
@@ -268,13 +261,17 @@
           correctLevel: QRCode.CorrectLevel.H
         });
 
-        document.getElementById('card-center-logo').classList.remove('hidden');
+        const compName = activeEmp?.company || "Speedex AutoWorkshop";
+        const logoImg = document.getElementById('card-center-logo');
+        logoImg.src = `logos/${compName}.png`;
+        logoImg.onerror = function() { this.src = 'logo.png'; };
+        document.getElementById('card-center-logo-box').classList.remove('hidden');
       }
     }
 
     function downloadCardAsImage() {
       const cardElement = document.getElementById('digital-card');
-      const filename = activeEmp ? `${activeEmp.name.replace(/\s+/g, '_')}_Speedex_Card.png` : 'Speedex_Card.png';
+      const filename = activeEmp ? `${activeEmp.name.replace(/\s+/g, '_')}_Card.png` : 'Digital_Card.png';
       
       html2canvas(cardElement, { scale: 2, useCORS: true }).then(canvas => {
         const link = document.createElement('a');
@@ -285,10 +282,11 @@
     }
 
     function downloadBrochureFile() {
-      const fileUrl = (activeEmp && activeEmp.brochure) ? activeEmp.brochure : 'speedex-brochure.pdf';
+      const compName = activeEmp?.company || "Speedex AutoWorkshop";
+      const fileUrl = activeEmp?.brochure || `brochures/${compName}.pdf`;
       const link = document.createElement('a');
       link.href = fileUrl;
-      link.download = fileUrl.split('/').pop();
+      link.download = `${compName}_Brochure.pdf`;
       link.target = '_blank';
       link.click();
     }
@@ -300,7 +298,7 @@
       const cPhone = document.getElementById('enq-phone').value;
       const cMsg = document.getElementById('enq-msg').value;
 
-      const textMessage = `Hello ${activeEmp.name},\nEnquiry:\nName: ${cName}\nPhone: ${cPhone}\nMsg: ${cMsg}`;
+      const textMessage = `Hello ${activeEmp.name},\nEnquiry regarding ${activeEmp.company || ''}:\nName: ${cName}\nPhone: ${cPhone}\nMsg: ${cMsg}`;
       const cleanPhone = activeEmp.phone.replace(/[^0-9]/g, '');
       window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(textMessage)}`, '_blank');
     }
