@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Speedex Digital Business Card</title>
+  <title>Digital Business Card</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -12,31 +12,27 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
     body { font-family: 'Montserrat', sans-serif; }
-
-    #card-qr-box img, #card-qr-box canvas {
-      width: 220px !important;
-      height: 220px !important;
-    }
+    #card-qr-box img, #card-qr-box canvas { width: 220px !important; height: 220px !important; }
   </style>
 </head>
 <body class="bg-slate-200 min-h-screen flex justify-center items-start sm:py-6">
 
   <div id="digital-card" class="w-full max-w-md bg-[#F3F4F6] min-h-screen sm:min-h-0 sm:rounded-[32px] shadow-2xl overflow-hidden relative">
 
-    <!-- Header Logo -->
+    <!-- Header Dynamic Logo -->
     <div class="bg-white py-5 px-4 text-center border-b border-slate-100">
-      <img id="card-header-logo" src="logo.png" alt="Company Logo" class="h-10 mx-auto object-contain">
+      <img id="card-header-logo" src="logo.png" alt="Company Logo" class="h-12 mx-auto object-contain">
     </div>
 
     <!-- Profile Header -->
-    <div class="bg-[#6B3020] text-white text-center pt-8 pb-10 px-4 relative">
-      <div class="absolute -top-7 left-1/2 -translate-x-1/2">
-        <div id="emp-avatar" class="w-16 h-16 rounded-full bg-[#404348] border-4 border-white flex items-center justify-center text-white text-xl font-extrabold shadow-md overflow-hidden">
+    <div class="bg-[#6B3020] text-white text-center pt-10 pb-10 px-4 relative">
+      <div class="absolute -top-8 left-1/2 -translate-x-1/2">
+        <div id="emp-avatar" class="w-20 h-20 rounded-full bg-[#404348] border-4 border-white flex items-center justify-center text-white text-xl font-extrabold shadow-md overflow-hidden">
           --
         </div>
       </div>
 
-      <h1 id="emp-name" class="text-xl font-extrabold tracking-tight mt-3">Fetching...</h1>
+      <h1 id="emp-name" class="text-xl font-extrabold tracking-tight mt-4">Loading...</h1>
       <p id="emp-desig" class="text-[11px] font-medium text-slate-200 mt-0.5">---</p>
       
       <div class="w-7 h-[1.5px] bg-white/30 mx-auto my-2"></div>
@@ -76,9 +72,9 @@
         <div id="card-qr-wrapper" class="p-3 bg-white border border-slate-200 rounded-2xl shadow-inner flex items-center justify-center">
           <div class="relative inline-block">
             <div id="card-qr-box" class="flex items-center justify-center"></div>
-            <!-- Center Logo Overlay -->
-            <div id="card-center-logo-box" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2 py-1 rounded-md border border-slate-300 shadow-md flex items-center justify-center max-w-[110px] max-h-[44px]">
-              <img id="card-center-logo" src="logo.png" alt="Logo" class="max-w-[95px] max-h-[30px] object-contain pointer-events-none">
+            <!-- Dynamic Center Logo Overlay -->
+            <div id="card-center-logo-box" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-1 rounded-md border border-slate-300 shadow-md flex items-center justify-center max-w-[100px] max-h-[40px]">
+              <img id="card-center-logo" src="logo.png" alt="Logo" class="max-w-[85px] max-h-[28px] object-contain pointer-events-none">
             </div>
           </div>
         </div>
@@ -165,21 +161,40 @@
       </div>
     </div>
 
+    <!-- Footer with Instagram, YouTube, LinkedIn -->
     <div class="bg-[#181A1E] text-white text-center py-5 px-4">
       <div class="flex justify-center items-center gap-4 mb-3">
         <a id="social-insta" href="https://instagram.com" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#6B3020] transition text-white text-sm">
           <i class="fa-brands fa-instagram"></i>
         </a>
+        <a id="social-youtube" href="https://youtube.com" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#6B3020] transition text-white text-sm">
+          <i class="fa-brands fa-youtube"></i>
+        </a>
+        <a id="social-linkedin" href="https://linkedin.com" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#6B3020] transition text-white text-sm">
+          <i class="fa-brands fa-linkedin-in"></i>
+        </a>
       </div>
-      <p id="footer-company-name" class="text-[9px] font-bold text-slate-400 tracking-wider uppercase">Speedex Auto Workshop LLC</p>
+      <p id="footer-company-name" class="text-[9px] font-bold text-slate-400 tracking-wider uppercase">SPEEDEX AUTO WORKSHOP LLC</p>
     </div>
 
   </div>
 
   <script>
     const SUPABASE_URL = "https://coejwpuctpkymcvzqzwh.supabase.co";
-    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY_HERE";
+    const SUPABASE_ANON_KEY = "sb_publishable_zxzYhq0Af8HAe4T4k8cpCw_uuC8F79d";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Exact File Extensions (.jpg) Mapping
+    const companyLogoMap = {
+      "1. Speedex Auto Workshop LLC": "logo.png",
+      "2. Arabsat Transport Passengers by Buses": "arabsat-logo.jpg",
+      "3. Excellent General Trading": "excellent-gt-logo.jpg",
+      "4. Speedex Signages": "signages-logo.jpg",
+      "5. Speedex Cars Rental": "cars-rental-logo.jpg",
+      "6. Excellent Field Contracting": "field-contracting-logo.jpg",
+      "7. Speedex Facility Management": "facility-management-logo.jpg",
+      "8. Excellent Group of Companies": "excellent-group-logo.jpg"
+    };
 
     let activeEmp = null;
 
@@ -187,26 +202,39 @@
       const urlParams = new URLSearchParams(window.location.search);
       const empId = urlParams.get('id');
 
-      if (!empId) {
-        document.getElementById('emp-name').innerText = "Card Not Found";
-        return;
+      let data = null;
+
+      if (empId) {
+        const res = await _supabase.from('employees').select('*').eq('id', empId).single();
+        data = res.data;
       }
 
-      const { data, error } = await _supabase.from('employees').select('*').eq('id', empId).single();
+      // ID இல்லாவிட்டாலும்/தவறாக இருந்தாலும் கடைசியாகச் சேர்த்த தரவைக் காட்டும் (Fallback)
+      if (!data) {
+        const res = await _supabase.from('employees').select('*').order('created_at', { ascending: false }).limit(1).single();
+        data = res.data;
+      }
 
-      if (error || !data) {
-        document.getElementById('emp-name').innerText = "Employee Not Found";
+      if (!data) {
+        document.getElementById('emp-name').innerText = "No Data Found";
         return;
       }
 
       activeEmp = data;
 
-      const compName = data.company || "Speedex AutoWorkshop";
-      document.getElementById('emp-company').innerText = compName;
-      document.getElementById('footer-company-name').innerText = compName;
+      const compName = data.company || "1. Speedex Auto Workshop LLC";
+      const cleanCompName = compName.replace(/^\d+\.\s*/, ''); // Number Prefix-ஐ அகற்றி காட்டும்
+
+      document.getElementById('emp-company').innerText = cleanCompName;
+      document.getElementById('footer-company-name').innerText = cleanCompName;
+
+      // Dynamic Company Logo Matching
+      const currentLogo = companyLogoMap[compName] || "logo.png";
+      document.getElementById('card-header-logo').src = currentLogo;
+      document.getElementById('card-center-logo').src = currentLogo;
 
       const avatarBox = document.getElementById('emp-avatar');
-      const initials = data.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+      const initials = data.name ? data.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() : "EX";
 
       if (data.photo_url) {
         avatarBox.innerHTML = `<img src="${data.photo_url}" alt="${data.name}" class="w-full h-full object-cover rounded-full" crossorigin="anonymous" onerror="this.onerror=null; this.parentElement.innerText='${initials}';">`;
@@ -214,14 +242,14 @@
         avatarBox.innerText = initials;
       }
 
-      document.getElementById('emp-name').innerText = data.name;
-      document.getElementById('emp-desig').innerText = data.desig;
-      document.getElementById('qr-emp-name').innerText = data.name;
-      document.getElementById('qr-emp-desig').innerText = data.desig;
+      document.getElementById('emp-name').innerText = data.name || "Employee Name";
+      document.getElementById('emp-desig').innerText = data.desig || "Designation";
+      document.getElementById('qr-emp-name').innerText = data.name || "";
+      document.getElementById('qr-emp-desig').innerText = data.desig || "";
 
-      document.getElementById('emp-phone').innerText = data.phone;
+      document.getElementById('emp-phone').innerText = data.phone || "-";
       document.getElementById('emp-phone').href = `tel:${data.phone}`;
-      document.getElementById('emp-email').innerText = data.email;
+      document.getElementById('emp-email').innerText = data.email || "-";
       document.getElementById('emp-email').href = `mailto:${data.email}`;
       document.getElementById('loc-display-address').innerText = data.loc || "Abu Dhabi";
       document.getElementById('gmap-btn').href = data.map_url || "#";
@@ -229,10 +257,10 @@
       document.getElementById('emp-website').innerText = data.website || "www.speedexgroups.ae";
       document.getElementById('emp-website').href = data.website?.startsWith('http') ? data.website : `https://${data.website}`;
 
-      const vcfData = `BEGIN:VCARD\nVERSION:3.0\nN:;${data.name};;;\nFN:${data.name}\nORG:${compName}\nTITLE:${data.desig}\nTEL;TYPE=CELL:${data.phone}\nEMAIL:${data.email}\nEND:VCARD`;
+      const vcfData = `BEGIN:VCARD\nVERSION:3.0\nN:;${data.name};;;\nFN:${data.name}\nORG:${cleanCompName}\nTITLE:${data.desig}\nTEL;TYPE=CELL:${data.phone}\nEMAIL:${data.email}\nEND:VCARD`;
       const blob = new Blob([vcfData], { type: 'text/vcard' });
       document.getElementById('vcf-btn').href = URL.createObjectURL(blob);
-      document.getElementById('vcf-btn').download = `${data.name.replace(/\s+/g, '_')}.vcf`;
+      document.getElementById('vcf-btn').download = `${(data.name || 'contact').replace(/\s+/g, '_')}.vcf`;
     }
 
     function switchTab(tab) {
@@ -264,7 +292,6 @@
           correctLevel: QRCode.CorrectLevel.H
         });
 
-        document.getElementById('card-center-logo').src = "logo.png";
         document.getElementById('card-center-logo-box').classList.remove('hidden');
       }
     }
