@@ -79,9 +79,9 @@
           </div>
         </div>
 
-        <button onclick="downloadCardQrCodeWithLogo()" class="mt-4 bg-[#6B3020] hover:bg-[#522418] text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition">
+        <button onclick="downloadCardQrCodeWithHDLogo()" class="mt-4 bg-[#6B3020] hover:bg-[#522418] text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition">
           <i class="fa-solid fa-download"></i>
-          <span>Download QR Code</span>
+          <span>Download High-Res QR Code</span>
         </button>
 
         <p id="qr-emp-name" class="font-bold text-slate-800 text-xs mt-3"></p>
@@ -93,8 +93,8 @@
     <div id="content-location" class="tab-content hidden p-5">
       <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 text-center">
         <h2 class="font-bold text-slate-800 text-sm mb-1">Our Location</h2>
-        <p id="loc-display-address" class="text-[11px] text-slate-500 mb-4">-</p>
-        <a id="gmap-btn" href="#" target="_blank" class="w-full bg-[#3D5D69] hover:bg-[#2e4751] text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow transition text-xs">
+        <p id="loc-display-address" class="text-[11px] text-slate-500 mb-4">Musaffah - M38 - Abu Dhabi</p>
+        <a id="gmap-btn" href="https://maps.google.com/?q=Speedex+Auto+Workshop+Musaffah+M38+Abu+Dhabi" target="_blank" class="w-full bg-[#3D5D69] hover:bg-[#2e4751] text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow transition text-xs">
           <i class="fa-solid fa-diamond-turn-right"></i>
           <span>Open in Google Maps</span>
         </a>
@@ -161,7 +161,7 @@
       </div>
     </div>
 
-    <!-- Footer with Instagram, YouTube, LinkedIn -->
+    <!-- Footer -->
     <div class="bg-[#181A1E] text-white text-center py-5 px-4">
       <div class="flex justify-center items-center gap-4 mb-3">
         <a id="social-insta" href="https://instagram.com" target="_blank" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#6B3020] transition text-white text-sm">
@@ -184,7 +184,6 @@
     const SUPABASE_ANON_KEY = "sb_publishable_zxzYhq0Af8HAe4T4k8cpCw_uuC8F79d";
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Exact File Extensions (.jpg) Mapping
     const companyLogoMap = {
       "1. Speedex Auto Workshop LLC": "logo.png",
       "2. Arabsat Transport Passengers by Buses": "arabsat-logo.jpg",
@@ -249,8 +248,10 @@
       document.getElementById('emp-phone').href = `tel:${data.phone}`;
       document.getElementById('emp-email').innerText = data.email || "-";
       document.getElementById('emp-email').href = `mailto:${data.email}`;
-      document.getElementById('loc-display-address').innerText = data.loc || "Abu Dhabi";
-      document.getElementById('gmap-btn').href = data.map_url || "#";
+      document.getElementById('loc-display-address').innerText = data.loc || "Musaffah - M38 - Abu Dhabi";
+      
+      // Default Speedex Auto Workshop Map Link Fallback
+      document.getElementById('gmap-btn').href = data.map_url || "https://maps.google.com/?q=Speedex+Auto+Workshop+Musaffah+M38+Abu+Dhabi";
 
       document.getElementById('emp-website').innerText = data.website || "www.speedexgroups.ae";
       document.getElementById('emp-website').href = data.website?.startsWith('http') ? data.website : `https://${data.website}`;
@@ -294,8 +295,8 @@
       }
     }
 
-    // Logo-வுடன் QR Code-ஐ டவுன்லோட் செய்யும் செயல்பாடு
-    function downloadCardQrCodeWithLogo() {
+    // High Clarity HD Ultra-Clear Download Function
+    function downloadCardQrCodeWithHDLogo() {
       const qrCanvas = document.querySelector('#card-qr-box canvas');
       const logoImg = document.getElementById('card-center-logo');
 
@@ -304,27 +305,30 @@
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
 
-      const size = 600;
+      const size = 2400; // High Resolution
       canvas.width = size;
       canvas.height = size;
 
-      // 1. Draw QR Code
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      // Draw QR Code
       ctx.drawImage(qrCanvas, 0, 0, size, size);
 
-      // 2. Draw White Center Box
+      // Draw Center White Box
       const logoWidth = size * 0.35;
       const logoHeight = size * 0.16;
       const x = (size - logoWidth) / 2;
       const y = (size - logoHeight) / 2;
 
       ctx.fillStyle = "#FFFFFF";
-      ctx.fillRect(x - 5, y - 5, logoWidth + 10, logoHeight + 10);
+      ctx.fillRect(x - 20, y - 20, logoWidth + 40, logoHeight + 40);
 
       ctx.strokeStyle = "#CBD5E1";
-      ctx.lineWidth = 4;
-      ctx.strokeRect(x - 5, y - 5, logoWidth + 10, logoHeight + 10);
+      ctx.lineWidth = 12;
+      ctx.strokeRect(x - 20, y - 20, logoWidth + 40, logoHeight + 40);
 
-      // 3. Draw Logo Image inside QR
+      // Draw HD Logo Image
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.src = logoImg.src;
@@ -332,10 +336,10 @@
       img.onload = function () {
         ctx.drawImage(img, x, y, logoWidth, logoHeight);
 
-        const filename = activeEmp ? `${activeEmp.name.replace(/\s+/g, '_')}_QR.png` : 'Digital_Card_QR.png';
+        const filename = activeEmp ? `${activeEmp.name.replace(/\s+/g, '_')}_HD_QR.png` : 'Digital_Card_HD_QR.png';
         const link = document.createElement('a');
         link.download = filename;
-        link.href = canvas.toDataURL('image/png');
+        link.href = canvas.toDataURL('image/png', 1.0);
         link.click();
       };
     }
@@ -344,7 +348,7 @@
       const cardElement = document.getElementById('digital-card');
       const filename = activeEmp ? `${activeEmp.name.replace(/\s+/g, '_')}_Card.png` : 'Digital_Card.png';
       
-      html2canvas(cardElement, { scale: 2, useCORS: true }).then(canvas => {
+      html2canvas(cardElement, { scale: 3, useCORS: true }).then(canvas => {
         const link = document.createElement('a');
         link.download = filename;
         link.href = canvas.toDataURL('image/png');
